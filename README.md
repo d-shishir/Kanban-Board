@@ -1,73 +1,63 @@
-# React + TypeScript + Vite
+# KanFlow | Modern Kanban Board
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![KanFlow Preview](https://images.unsplash.com/photo-1604223190546-a43e4c7f29d7?q=80&w=2069&auto=format&fit=crop)
 
-Currently, two official plugins are available:
+**KanFlow** is a premium, high-performance Kanban board built with React, TypeScript, and Framer Motion. Designed with a sophisticated glassmorphic aesthetic, it features a warm, earth-toned theme inspired by serene landscapes.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+[Live Demo](https://kanflow-modern.netlify.app) _(Replace with your specific Netlify URL)_
 
-## React Compiler
+## ✨ Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Pristine Glassmorphic UI**: High-end translucent surfaces with backdrop blurring and subtle warm earthy accents.
+- **Fluid Drag & Drop**: Smooth, hardware-accelerated task reordering and column movement via `@dnd-kit`.
+- **Integrated Theme Engine**: Perfectly balanced light and dark modes with a satisfying animated toggle.
+- **Priority Management**: Interactive priority badges (🔥 High, ⚡ Medium, 🌿 Low) with matching visual accents.
+- **Advanced Filtering**: Instant search and priority-based filtering for efficient task management.
+- **Mobile-First Design**: Responsive layout with horizontal column scrolling and sheet-style mobile modals.
+- **Persistence**: Automatically saves your board state to local storage.
 
-## Expanding the ESLint configuration
+## 🚀 Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- **Framework**: [React 19](https://react.dev/)
+- **Language**: [TypeScript](https://www.typescriptlang.org/)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Utilities**: [Lucide React](https://lucide.dev/), [date-fns](https://date-fns.org/), [clsx](https://github.com/lukeed/clsx)
+- **Drag & Drop**: [dnd-kit](https://dnd-kit.com/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 🛠️ Getting Started
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Prerequisites
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- [Node.js](https://nodejs.org/) (v18 or higher)
+- [npm](https://www.npmjs.com/)
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Installation
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/your-username/kanflow.git
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## 📦 Deployment
+
+### Netlify (Recommended)
+
+This project is configured for automated deployment via Netlify.
+
+1. Push your code to GitHub.
+2. Connect your GitHub repository to [Netlify](https://www.netlify.com/).
+3. The `netlify.toml` file handles the build configuration automatically.
+
+---
+
+Built with pride by [Your Name]
