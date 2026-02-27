@@ -1,0 +1,156 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme {
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+
+  --radius-lg: var(--radius);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 4px);
+}
+
+@layer base {
+  /* ── Light Mode ─────────────────────────────── */
+  :root {
+    /* Warm amber/earth tone pulled directly from the background landscape */
+    --primary: #c2863a;
+    --primary-foreground: #ffffff;
+    --ring: #c2863a;
+
+    --background: #f5f0eb;
+    --foreground: #1c1410;
+
+    --card: #ffffff;
+    --card-foreground: #1c1410;
+    --popover: #ffffff;
+    --popover-foreground: #1c1410;
+
+    --secondary: #ede8e1;
+    --secondary-foreground: #3d2e1e;
+    --muted: #e8e2d9;
+    --muted-foreground: #7a6650;
+    --accent: #f0ebe3;
+    --accent-foreground: #3d2e1e;
+
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+
+    --border: rgba(160, 130, 100, 0.25);
+    --input: rgba(160, 130, 100, 0.25);
+    --radius: 0.75rem;
+  }
+
+  /* ── Dark Mode ──────────────────────────────── */
+  [data-theme="dark"] {
+    --primary: #d4904a;
+    --primary-foreground: #ffffff;
+    --ring: #d4904a;
+
+    --background: #0f0c09;
+    --foreground: #f5ede0;
+
+    --card: #1a1410;
+    --card-foreground: #f5ede0;
+    --popover: #1a1410;
+    --popover-foreground: #f5ede0;
+
+    --secondary: #2a201a;
+    --secondary-foreground: #f5ede0;
+    --muted: #241c16;
+    --muted-foreground: #a08060;
+    --accent: #2a201a;
+    --accent-foreground: #f5ede0;
+
+    --destructive: #dc2626;
+    --destructive-foreground: #ffffff;
+
+    --border: rgba(255, 200, 150, 0.10);
+    --input: rgba(255, 200, 150, 0.10);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ── Glass Surfaces ─────────────────────────────
+   Light: frosted bright white glass
+   Dark: smoky warm dark glass
+   Applied via CSS so they properly respond to data-theme
+─────────────────────────────────────────────── */
+.glass {
+  background: rgba(255, 248, 240, 0.60);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(220, 180, 140, 0.30);
+}
+
+[data-theme="dark"] .glass {
+  background: rgba(20, 14, 8, 0.55);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border-bottom: 1px solid rgba(180, 130, 80, 0.15);
+}
+
+/* ── Scrollbar ──────────────────────────────────  */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(160, 120, 80, 0.35);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+}
+
+/* Date picker icon */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  opacity: 0.45;
+  cursor: pointer;
+  filter: sepia(0.5);
+}
