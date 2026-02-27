@@ -5,6 +5,7 @@ import {
   closestCorners,
   KeyboardSensor,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
 } from '@dnd-kit/core';
@@ -27,6 +28,7 @@ import { Modal } from '../../components/ui/Modal';
 import { Button } from '../../components/ui/Button';
 import { AnimatePresence } from 'framer-motion';
 import { cn } from '../../utils/cn';
+import { Plus } from 'lucide-react';
 
 export default function KanbanBoard() {
   const { state, dispatch } = useBoard();
@@ -41,9 +43,10 @@ export default function KanbanBoard() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 5, // 5px drag intent to allow clicking items inside Draggable
-      },
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { delay: 200, tolerance: 6 },
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
@@ -63,18 +66,14 @@ export default function KanbanBoard() {
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event;
     const task = state.tasks.find((t) => t.id === active.id);
-    if (task) {
-      setActiveTask(task);
-    }
+    if (task) setActiveTask(task);
   };
 
   const handleDragOver = (event: DragOverEvent) => {
     const { active, over } = event;
     if (!over) return;
-
     const activeId = active.id as string;
     const overId = over.id as string;
-
     if (activeId === overId) return;
 
     const isActiveTask = active.data.current?.type === 'Task';
@@ -83,39 +82,26 @@ export default function KanbanBoard() {
 
     if (!isActiveTask) return;
 
-    // Dropping a Task over another Task
     if (isActiveTask && isOverTask) {
       const activeTaskData = active.data.current?.task as Task;
       const overTaskData = over.data.current?.task as Task;
-
       if (activeTaskData.columnId !== overTaskData.columnId) {
-        // Find index of overTask in its column to insert there
         const columnTasks = state.tasks.filter(t => t.columnId === overTaskData.columnId);
         const overIndex = columnTasks.findIndex(t => t.id === overId);
-        
         dispatch({
           type: 'MOVE_TASK',
-          payload: {
-            taskId: activeId,
-            toColumnId: overTaskData.columnId,
-            newIndex: overIndex,
-          },
+          payload: { taskId: activeId, toColumnId: overTaskData.columnId, newIndex: overIndex },
         });
       }
     }
 
-    // Dropping a Task over an empty Column
     if (isActiveTask && isOverColumn) {
       const activeTaskData = active.data.current?.task as Task;
       if (activeTaskData.columnId !== overId) {
         const columnTasksCount = state.tasks.filter(t => t.columnId === overId).length;
         dispatch({
           type: 'MOVE_TASK',
-          payload: {
-            taskId: activeId,
-            toColumnId: overId,
-            newIndex: columnTasksCount, // Add to end
-          },
+          payload: { taskId: activeId, toColumnId: overId, newIndex: columnTasksCount },
         });
       }
     }
@@ -125,49 +111,27 @@ export default function KanbanBoard() {
     setActiveTask(null);
     const { active, over } = event;
     if (!over) return;
-
     const activeId = active.id as string;
     const overId = over.id as string;
-
     if (activeId === overId) return;
 
     const isActiveTask = active.data.current?.type === 'Task';
     const isOverTask = over.data.current?.type === 'Task';
 
-    // If dropping over a task IN THE SAME COLUMN, reorder them
     if (isActiveTask && isOverTask) {
        const activeTaskData = active.data.current?.task as Task;
        const overTaskData = over.data.current?.task as Task;
-
        if (activeTaskData.columnId === overTaskData.columnId) {
-          // Both in same column, we need to reorder
-          // For a fully robust approach, arrayMove is preferred, but simple indexing works if done carefully globally.
-          // Since our tasks array is flat, we must find flat indices.
-          const activeIndex = state.tasks.findIndex(t => t.id === activeId);
-          const overIndex = state.tasks.findIndex(t => t.id === overId);
-          
-          if (activeIndex !== overIndex) {
-             // To properly preserve position across UI, we basically swap them in the main tasks array or re-insert
-             // Let's create a new 'MOVE_TASK' specific for same-column reorder via absolute index for simplicity here.
-             // Actually, doing this directly with `dispatch` and an arrayMove action is cleanest:
-             // Instead, let's implement a quick workaround: since MOVE_TASK accepts newIndex relative to column, let's calculate the relative overIndex:
-             const columnTasks = state.tasks.filter(t => t.columnId === activeTaskData.columnId);
-             const relativeOverIndex = columnTasks.findIndex(t => t.id === overId);
-             
-             dispatch({
-               type: 'MOVE_TASK',
-               payload: {
-                 taskId: activeId,
-                 toColumnId: activeTaskData.columnId,
-                 newIndex: relativeOverIndex,
-               }
-             });
-          }
+          const columnTasks = state.tasks.filter(t => t.columnId === activeTaskData.columnId);
+          const relativeOverIndex = columnTasks.findIndex(t => t.id === overId);
+          dispatch({
+            type: 'MOVE_TASK',
+            payload: { taskId: activeId, toColumnId: activeTaskData.columnId, newIndex: relativeOverIndex },
+          });
        }
     }
   };
 
-  // Helpers to open modals
   const handleOpenCreateModal = (columnId?: string) => {
     setDefaultColumnForNewTask(columnId);
     setEditingTask(undefined);
@@ -179,22 +143,20 @@ export default function KanbanBoard() {
     setIsTaskModalOpen(true);
   };
 
-  const closeModal = () => {
-    setIsTaskModalOpen(false);
-  };
+  const closeModal = () => setIsTaskModalOpen(false);
 
   return (
-    <div className="flex h-full flex-col gap-3">
-      {/* Board Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        {/* Priority chips — scrollable row on very narrow screens */}
-        <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-0.5">
+    <div className="flex h-full flex-col gap-2.5 sm:gap-3">
+      {/* ── Board Controls ─────────────────────── */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Priority filter chips */}
+        <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar">
           {(['All', 'High', 'Medium', 'Low'] as const).map((p) => (
             <button
               key={p}
               onClick={() => dispatch({ type: 'SET_PRIORITY_FILTER', payload: p as Priority | 'All' })}
               className={cn(
-                'h-7 shrink-0 rounded-full px-3 text-xs font-semibold transition-all border',
+                'h-7 sm:h-8 shrink-0 rounded-full px-2.5 sm:px-3.5 text-[11px] sm:text-xs font-semibold transition-all border',
                 state.priorityFilter === p
                   ? 'bg-primary text-white border-primary shadow-sm'
                   : 'border-white/30 dark:border-white/10 bg-white/50 dark:bg-white/5 backdrop-blur-sm text-foreground hover:bg-white/70 dark:hover:bg-white/10',
@@ -204,7 +166,7 @@ export default function KanbanBoard() {
             </button>
           ))}
           {(state.searchQuery || state.priorityFilter !== 'All') && (
-            <span className="shrink-0 rounded-full bg-primary/10 text-primary px-2.5 py-0.5 text-xs font-medium border border-primary/20">
+            <span className="shrink-0 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-medium border border-primary/20">
               Filtered
             </span>
           )}
@@ -212,14 +174,17 @@ export default function KanbanBoard() {
 
         <Button
           onClick={() => handleOpenCreateModal()}
-          className="shrink-0 rounded-full px-4 h-7 text-xs font-semibold"
+          className="shrink-0 rounded-full h-7 sm:h-8 px-3 sm:px-4 text-[11px] sm:text-xs font-semibold gap-1"
         >
-          + Add Task
+          <Plus className="h-3.5 w-3.5 sm:hidden" />
+          <span className="hidden sm:inline">+ Add Task</span>
+          <span className="sm:hidden">Add</span>
         </Button>
       </div>
 
-      {/* Board Columns Area — horizontal scroll on mobile */}
-      <div className="flex flex-1 overflow-x-auto overflow-y-hidden rounded-2xl border border-white/20 dark:border-white/8 bg-white/15 dark:bg-black/20 backdrop-blur-sm">
+      {/* ── Board Columns ──────────────────────── */}
+      {/* Mobile: vertical stack, scrollable | Desktop: horizontal row */}
+      <div className="flex flex-1 overflow-hidden rounded-2xl border border-white/20 dark:border-white/8 bg-white/15 dark:bg-black/20 backdrop-blur-sm">
         <DndContext
           sensors={sensors}
           collisionDetection={closestCorners}
@@ -227,7 +192,11 @@ export default function KanbanBoard() {
           onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
         >
-          <div className="flex h-full w-full gap-4 p-4">
+          {/* 
+            Mobile:  flex-col, overflow-y-auto   → columns stack vertically
+            Desktop: flex-row, overflow-x-auto   → columns sit side-by-side
+          */}
+          <div className="flex flex-col md:flex-row h-full w-full gap-2.5 sm:gap-3 p-2.5 sm:p-3 overflow-y-auto md:overflow-y-hidden md:overflow-x-auto">
             <SortableContext items={state.columns.map((c) => c.id)}>
               {state.columns.map((column) => (
                 <KanbanColumn
@@ -243,7 +212,7 @@ export default function KanbanBoard() {
 
           <DragOverlay>
             {activeTask ? (
-              <div className="rotate-2 scale-105 shadow-xl transition-transform">
+              <div className="rotate-1 scale-105 shadow-xl">
                 <TaskCard task={activeTask} onEdit={() => {}} />
               </div>
             ) : null}
@@ -251,7 +220,7 @@ export default function KanbanBoard() {
         </DndContext>
       </div>
 
-      {/* Main Task Modal */}
+      {/* ── Modal ──────────────────────────────── */}
       <AnimatePresence>
         {isTaskModalOpen && (
           <Modal

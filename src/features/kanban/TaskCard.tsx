@@ -108,7 +108,7 @@ export function TaskCard({ task, onEdit }: TaskCardProps) {
               setIsMenuOpen(!isMenuOpen);
             }}
             onPointerDown={(e) => e.stopPropagation()}
-            className="h-6 w-6 flex items-center justify-center rounded-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-black/8 dark:hover:bg-white/10"
+            className="h-7 w-7 sm:h-6 sm:w-6 flex items-center justify-center rounded-md sm:opacity-0 sm:group-hover:opacity-100 transition-opacity hover:bg-black/8 dark:hover:bg-white/10"
           >
             <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground" />
           </button>
